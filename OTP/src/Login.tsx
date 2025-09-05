@@ -8,23 +8,80 @@ export default function Login() {
   const [step, setStep] = useState("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const loginUrl = "https://localhost:7201/api/login";
+  const qrCodeUrl = "https://localhost:7201/api/generate";
+  const verifyUrl = "https://localhost:7201/api/verify";
+  const [qrCode64, setQrCode64] = useState("");
+  const [otpCode, setOtpCode] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    setLoading(true);
     // 模擬帳號密碼驗證
     if (username && password) {
-      setStep("otp");
+        const response = await fetch(loginUrl, {
+          method: 'POST',
+          headers: {"Content-Type": "application/json"},
+          body  : JSON.stringify({ username, password })
+          });
+        const data = await response.json();
+        if (!response.ok){
+            alert("登入失敗 ❌");
+        }
+        else if (data.status === "need verify"){
+            localStorage.setItem("username", data.username);
+            localStorage.setItem("password", data.password);
+            localStorage.setItem("status", data.status);
+            fetchQrCode();
+            setStep("otp");
+        }
+        else{
+            alert("發生錯誤 ❌");
+        }
     } else {
       alert("請輸入帳號與密碼");
     }
+    setLoading(false);
   };
 
-  const handleVerifyOtp = () => {
-    // 模擬 OTP 驗證
-    if (otp === "123456") {
-      alert("登入成功 ✅");
-    } else {
-      alert("OTP 驗證失敗 ❌");
+  const fetchQrCode = async () => {
+    var username = localStorage.getItem("username");
+    var password = localStorage.getItem("password");
+    console.log(username, password);
+    const code  = await fetch (qrCodeUrl,
+        { 
+            method: 'POST' ,
+            headers: {"Content-Type": "application/json"},
+            body : JSON.stringify({ username, password })
+        });
+    const data = await code.text();
+    if (!code.ok){
+        alert("取得 QR Code 失敗 ❌");
+    }
+    else{
+        setQrCode64(data);
+    }
+  }
+  const handleVerifyOtp = async () => {
+    if (!otpCode || otpCode.length !== 6) {
+      alert("請輸入 6 位數 OTP");
+      return;
+    }
+    else{
+        var username = localStorage.getItem("username");
+        var password = localStorage.getItem("password");
+        const response = await fetch(verifyUrl,
+        {
+            method  : 'POST',
+            headers : {"Content-Type": "application/json"},
+            body    : JSON.stringify({ username, password, otpCode })
+        });
+        if (response.ok){
+            alert("OTP 驗證成功 ✅");
+        }
+        else{
+            alert("OTP 驗證失敗 ❌");
+        }
     }
   };
 
@@ -58,12 +115,21 @@ export default function Login() {
             )}
 
             {step === "otp" && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold text-center">OTP 驗證</h2>
+              <div className="space-y-4 text-center">
+                <h2 className="text-xl font-bold">OTP 驗證</h2>
+                {qrCode64 && (
+                    <div className="flex justify-center">
+                        <img 
+                        src={`data:image/png;base64,${qrCode64}`}
+                        alt="OTP QR Code"
+                        className="mx-auto w-48 h-48 border rounded-md"
+                        />
+                    </div>
+                )}
                 <Input
                   placeholder="輸入 6 位數 OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
                 />
                 <Button className="w-full" onClick={handleVerifyOtp}>
                   驗證
