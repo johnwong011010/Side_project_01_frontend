@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [step, setStep] = useState("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -78,6 +80,7 @@ export default function Login() {
         });
         if (response.ok){
             alert("OTP 驗證成功 ✅");
+            navigate("/main");
         }
         else{
             alert("OTP 驗證失敗 ❌");
