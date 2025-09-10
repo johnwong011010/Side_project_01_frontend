@@ -9,7 +9,7 @@ function MainPage() {
                 <nav>
                     <a href="#" style={{ color: '#fff', marginRight: '2rem' }}>帳戶總覽</a>
                     <a href="#" style={{ color: '#fff', marginRight: '2rem' }}>轉帳</a>
-                    <Link to="/noCard" style={{ color: '#fff', marginRight: '2rem' }}>無卡提款專區</Link>
+                    <Link to="/verify" style={{ color: '#fff', marginRight: '2rem' }}>無卡提款專區</Link>
                     <a href="#" style={{ color: '#fff' }}>登出</a>
                 </nav>
             </header>
