@@ -11,8 +11,8 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const loginUrl = "https://localhost:7201/api/login";
-  const qrCodeUrl = "https://localhost:7201/api/generate";
+  const loginUrl = "https://localhost:7201/api/user";
+  const qrCodeUrl = "https://localhost:7201/api/loginCode";
   const verifyUrl = "https://localhost:7201/api/verify";
   const [qrCode64, setQrCode64] = useState("");
   const [otpCode, setOtpCode] = useState("");
